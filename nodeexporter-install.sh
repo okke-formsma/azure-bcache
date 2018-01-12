@@ -4,7 +4,7 @@ tar -xvzf /tmp/node_exporter.tar.gz
 sudo mv node_exporter-0.15.2.linux-amd64/node_exporter /usr/local/bin/node_exporter
 rm -rf node_exporter-0.15.2.linux-amd64
 
-sudo bash -c 'cat >> /etc/systemd/system/node_exporter.service' <<EOT
+sudo bash -c 'cat > /etc/systemd/system/node_exporter.service' <<'EOT'
 [Unit]
 Description=Node Exporter
 Wants=network-online.target
