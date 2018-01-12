@@ -2,6 +2,8 @@
 # This script installs bcache on an already running elasticsearch node.
 # All data on the node will be destroyed!
 
+set -x
+
 # change cloud-init config to not mount ephemeral0 to /mnt.
 bash -c 'cat >> /etc/cloud/cloud.cfg' <<EOT
 mounts:
@@ -29,8 +31,9 @@ mkfs.ext4 /dev/bcache0
 mount /dev/bcache0 /datadisks/disk1
 
 # recreate elasticsearch directories
-mkdir /mnt/elasticsearch
-chown elasticsearch:elasticsearch /mnt/elasticsearch
+mkdir /datadisks/disk1/elasticsearch
+chown elasticsearch:elasticsearch /datadisks/disk1/elasticsearch
+
 
 # set up bcache init script
 bash -c 'cat >> /etc/init.d/bcache' <<EOT
