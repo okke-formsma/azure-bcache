@@ -19,7 +19,7 @@ cat /etc/fstab.old | sed '/datadisks\/disk1/d' > /etc/fstab
 
 # stop elasticsearch
 monit stop elasticsearch
-sleep 1
+sleep 5
 
 # unmount previously mounted disks
 umount /mnt
@@ -28,6 +28,7 @@ umount /datadisks/disk1
 # set up data disk
 wipefs -a /dev/sdc1
 make-bcache -B /dev/sdc1
+make-bcache -B /dev/sdc1 # if we do this only once, the /sys/block/sdc/sdc1/bcache directory does not exist... ?
 echo 1 > /sys/block/sdc/sdc1/bcache/running
 sleep 1
 mkfs.ext4 /dev/bcache0
