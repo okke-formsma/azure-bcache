@@ -87,6 +87,15 @@ chmod +x /etc/init.d/bcache
 update-rc.d bcache defaults
 /etc/init.d/bcache start
 
+
+# Setup elasticsearch JVM memory max
+# set up bcache init script
+cat >> /etc/elasticsearch/jvm.options <<'EOT'
+-Xmx6G
+-Xms6G
+EOT
+
+
 monit start elasticsearch
 
 # print info
