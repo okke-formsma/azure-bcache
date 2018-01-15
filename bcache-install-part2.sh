@@ -3,8 +3,6 @@
 
 set -e
 
-echo /dev/sdc > /sys/fs/bcache/register
-sleep 1
 echo 1 > /sys/block/sdc/sdc1/bcache/running
 sleep 1
 mkfs.ext4 /dev/bcache0
