@@ -33,6 +33,7 @@ wipefs -a /dev/sdc1
 make-bcache -B /dev/sdc1
 
 #enable bcache module
+echo /dev/sdc1 > /sys/fs/bcache/register
 echo 1 > /sys/block/sdc/sdc1/bcache/running
 sleep 1
 
