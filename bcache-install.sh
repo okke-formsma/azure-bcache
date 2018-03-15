@@ -22,6 +22,8 @@ cat /etc/fstab.old | sed '/datadisks\/disk1/d' > /etc/fstab
 monit stop elasticsearch
 sleep 5
 
+modprobe bcache
+
 # unmount previously mounted disks
 umount /mnt
 umount /datadisks/disk1
@@ -31,7 +33,6 @@ wipefs -a /dev/sdc1
 make-bcache -B /dev/sdc1
 
 #enable bcache module
-modprobe bcache
 echo 1 > /sys/block/sdc/sdc1/bcache/running
 sleep 1
 
@@ -65,8 +66,6 @@ rc=0
 start() {
   if [ ! -e /sys/block/bcache0/bcache/cache ]
   then
-    echo 1 > /sys/block/$basedisk$base/bcache/running
-    sleep 3
     umount /dev/$cache
     /sbin/wipefs -a -t ext2,ext3,ext4 /dev/$cache
     /usr/sbin/make-bcache -C /dev/$cache
@@ -76,10 +75,13 @@ start() {
     echo $name > /sys/block/bcache0/bcache/attach
     # Some performance tuning, we assume NAS is always
     # going to be slower than local SSDs
+    echo 1 > /sys/block/$basedisk$base/bcache/running
+    sleep 1
     echo 0 > /sys/block/bcache0/bcache/sequential_cutoff
     sleep 1
     echo 0 > /sys/block/bcache0/bcache/cache/congested_read_threshold_us
     echo 0 > /sys/block/bcache0/bcache/cache/congested_write_threshold_us
+    echo writeback > /sys/block/bcache0/bcache/cache_mode
   fi
   touch /var/lock/subsys/bcache
   return 0
@@ -126,7 +128,12 @@ cat >> /etc/elasticsearch/jvm.options <<'EOT'
 -Xms6G
 EOT
 
-monit start elasticsearch
+# tune elasticsearch search thread pool for more concurrent searches. (default cores*1.5+1)
+cat >> /etc/elasticsearch/elasticsearch.yml <<'EOT'
+thread_pool.search.size: 30
+EOT
+
+monit restart elasticsearch
 
 # print info
 lsblk -o NAME,MAJ:MIN,RM,SIZE,TYPE,FSTYPE,MOUNTPOINT,UUID,PARTUUID
