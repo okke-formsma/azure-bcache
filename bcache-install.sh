@@ -134,6 +134,22 @@ cat >> /etc/elasticsearch/elasticsearch.yml <<'EOT'
 thread_pool.search.size: 30
 EOT
 
+cat > /tmp/log4j2.properties.add <<'EOT'
+appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+appender.rolling.policies.size.size = 256MB
+appender.rolling.strategy.type = DefaultRolloverStrategy
+appender.rolling.strategy.fileIndex = nomax
+appender.rolling.strategy.action.type = Delete
+appender.rolling.strategy.action.basepath = ${sys:es.logs.base_path}
+appender.rolling.strategy.action.condition.type = IfFileName
+appender.rolling.strategy.action.condition.glob = ${sys:es.logs.cluster_name}-*
+appender.rolling.strategy.action.condition.nested_condition.type = IfAccumulatedFileSize
+appender.rolling.strategy.action.condition.nested_condition.exceeds = 2GB
+EOT
+
+sed -i.bak '/appender.rolling.policies.time.modulate = true/r /tmp/log4j2.properties.add' /etc/elasticsearch/log4j2.properties
+
+
 monit restart elasticsearch
 
 # print info
