@@ -82,7 +82,7 @@ start() {
     sleep 1
     echo 0 > /sys/block/bcache0/bcache/cache/congested_read_threshold_us
     echo 0 > /sys/block/bcache0/bcache/cache/congested_write_threshold_us
-    echo writeback > /sys/block/bcache0/bcache/cache_mode
+    echo writethrough > /sys/block/bcache0/bcache/cache_mode
   fi
   touch /var/lock/subsys/bcache
   return 0
