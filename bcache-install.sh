@@ -122,18 +122,6 @@ update-rc.d bcache defaults
 /etc/init.d/bcache start
 
 
-# Setup elasticsearch JVM memory max
-# set up bcache init script
-cat >> /etc/elasticsearch/jvm.options <<'EOT'
--Xmx6G
--Xms6G
-EOT
-
-# tune elasticsearch search thread pool for more concurrent searches. (default cores*1.5+1)
-cat >> /etc/elasticsearch/elasticsearch.yml <<'EOT'
-thread_pool.search.size: 30
-EOT
-
 monit restart elasticsearch
 
 # print info
